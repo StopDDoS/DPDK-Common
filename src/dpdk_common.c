@@ -1195,3 +1195,53 @@ int check_and_del_lru_from_hash_table(void *tbl, __u32 max_entries)
 
     return 0;
 }
+
+
+
+/**
+ * Swaps the source and destination ethernet MAC addresses.
+ * 
+ * @param eth A pointer to the ethernet header (struct rte_ether_hdr).
+ * 
+ * @return Void
+**/
+static void swap_eth(struct rte_ether_hdr *eth)
+{
+    struct rte_ether_addr tmp;
+    rte_ether_addr_copy(&eth->src_addr, &tmp);
+
+    rte_ether_addr_copy(&eth->dst_addr, &eth->src_addr);
+    rte_ether_addr_copy(&tmp, &eth->dst_addr);
+}
+
+/**
+ * Swaps the source and destination IP addresses.
+ * 
+ * @param iph A pointer to the IPv4 header (struct rte_ipv4_hdr).
+ * 
+ * @return Void
+**/
+static void swap_iph(struct rte_ipv4_hdr *iph)
+{
+    rte_be32_t tmp;
+    memcpy(&tmp, &iph->src_addr, sizeof(tmp));
+
+    memcpy(&iph->src_addr, &iph->dst_addr, sizeof(iph->src_addr));
+    memcpy(&iph->dst_addr, &tmp, sizeof(iph->dst_addr));
+}
+
+/**
+ * Swaps the source and destination UDP ports.
+ * 
+ * @param udph A pointer to the UDP header (struct rte_udp_hdr).
+ * 
+ * @return Void
+**/
+static void swap_udph(struct rte_udp_hdr *udph)
+{
+    rte_be16_t tmp;
+    memcpy(&tmp, &udph->src_port, sizeof(tmp));
+
+    memcpy(&udph->src_port, &udph->dst_port, sizeof(udph->src_port));
+    memcpy(&udph->dst_port, &tmp, sizeof(udph->dst_port));
+}
